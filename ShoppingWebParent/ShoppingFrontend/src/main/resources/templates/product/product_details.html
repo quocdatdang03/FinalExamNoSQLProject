@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <div th:replace="/fragment/fragments :: html_head('Product Details', 'tag')">
+    </div>
+
+    <style>
+        .image-container {
+            width: 100%;
+            padding-top: 75%; /* Tỷ lệ 4:3 (điều chỉnh nếu cần) */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            position: absolute;
+            top : 0;
+            left:0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.1); /* Phóng to hình ảnh khi di chuột */
+        }
+
+        .product-title {
+            font-size: 16px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2; /* Giới hạn văn bản trong 2 dòng */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-tabs .nav-link.active {
+            border-top: 3px solid #0573f0;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background-color: #0056b3; /* Màu nền khi hover */
+            color: #fff;
+        }
+
+        /* CSS for extra image: */
+        .extra-image-container {
+            max-width: 100px; /* Max width of container */
+            max-height: 100px;
+            display: flex;
+            align-items : center;
+            justify-content: center;
+        }
+
+        .extra-image {
+            max-width: 100%; /* Ensures the image doesn't exceed the container size */
+            height: 100%;    /* Maintains aspect ratio */
+            object-fit: contain;
+            opacity: 0.5;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .extra-image:hover {
+            opacity: 1;
+        }
+
+        .extra-image.active {
+            opacity:1;
+        }
+
+        @media (max-width: 768px) {
+            .extra-image-container {
+                max-width: 80px; /* Resize for smaller screens */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .extra-image-container {
+                max-width: 60px; /* Resize for very small screens */
+            }
+        }
+
+        .btn-slider {
+            position: absolute;
+            top : 50%;
+            background-color: transparent;
+            border:none;
+        }
+        .btn-slider-previous {
+            left: 20%;
+            transform: translate(-50%,-20%);
+        }
+
+        .btn-slider-next {
+            right: 20%;
+            transform: translate(-50%,-20%);
+        }
+
+        .image-slider {
+            width: 100%;
+            padding-top: 75%; /* Tỷ lệ 4:3 (điều chỉnh nếu cần) */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-slider img {
+            position: absolute;
+            top : 0;
+            left:0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+
+    </style>
+</head>
+
+<body>
+<!-- Topbar Start -->
+<div th:replace="/fragment/header :: web_header">
+
+</div>
+<!-- Topbar End -->
+
+
+<!-- Navbar Start -->
+<div th:replace="/fragment/navbar :: web_navbar">
+
+</div>
+<!-- Navbar End -->
+
+
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" th:href="@{/products}">Home</a>
+                <span class="breadcrumb-item active">Shop Detail</span>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+
+<!-- Shop Detail Start -->
+<div class="container-fluid pb-5">
+    <div class="row px-xl-5">
+        <div class="col-lg-5 mb-30">
+            <div class="image-container">
+                <img id="bigImage" th:src="@{${product.mainImagePath}}" th:alt="${product.mainImage}" indexImage="0"/>
+            </div>
+            <div class="d-flex flex-wrap justify-content-center mt-3 gap-2">
+                <div class="extra-image-container border mx-2 p-2">
+                    <img class="img-fluid extra-image active" th:src="@{${product.mainImagePath}}" th:alt="${product.mainImage}" indexImage="0"/>
+                </div>
+                <th:block th:each="item, itemStatus : ${product.extraImages}">
+                    <div class="extra-image-container border mx-2 p-2">
+                        <img class="img-fluid extra-image" th:src="@{${item.productExtraImagePath}}" th:alt="${item.name}" th:indexImage="${itemStatus.count}"/>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="col-lg-7 h-auto mb-30">
+            <div class="h-100 bg-light p-30">
+                <h3>[[${product.name}]]</h3>
+                <div class="d-flex mb-3">
+                    <div class="text-primary mr-2">
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star"></small>
+                        <small class="fas fa-star-half-alt"></small>
+                        <small class="far fa-star"></small>
+                    </div>
+                    <small class="pt-1">(99 Reviews)</small>
+                </div>
+                <h3 class="font-weight-semi-bold mb-4">
+                    <th:block th:if="${product.discountPercent>0}">
+                        <span>
+                            $[[${product.discountPrice}]]
+                        </span>
+                        <span class="text-muted ml-2">
+                            <del>
+                                <span>
+                                    $[[${product.price}]]
+                                </span>
+                            </del>
+                        </span>
+                    </th:block>
+                    <th:block th:unless="${product.discountPercent>0}">
+                        <span>
+                             $[[${product.price}]]
+                        </span>
+                    </th:block>
+                </h3>
+                <p class="mb-4">[[${product.shortDescription}]]</p>
+                <div class="d-flex mb-4">
+                    <strong class="text-dark mr-3">State:</strong>
+                    <div th:if="${product.inStock==true}">
+                        In stock
+                    </div>
+                    <div th:unless="${product.inStock==true}">
+                        Sold out
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-4 pt-2">
+                    <div class="input-group quantity mr-3" style="width: 130px;">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary btn-minus">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <input type="text" class="form-control bg-secondary border-0 text-center" value="1">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary btn-plus">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To
+                        Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row px-xl-5">
+        <div class="col">
+            <div class="bg-light p-30">
+                <div class="nav nav-tabs mb-4">
+                    <a class="nav-item nav-link text-dark active" data-toggle="tab" href="#tab-pane-1">Description</a>
+                    <a class="nav-item nav-link text-dark" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-pane-1">
+                        <h4 class="mb-3">Product Description</h4>
+                        <p>[[${product.fullDescription}]]</p>
+                    </div>
+                    <div class="tab-pane fade" id="tab-pane-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4 class="mb-4">1 review for "Product Name"</h4>
+                                <div class="media mb-4">
+                                    <img src="img/user.jpg" alt="Image" class="img-fluid mr-3 mt-1" style="width: 45px;">
+                                    <div class="media-body">
+                                        <h6>John Doe<small> - <i>01 Jan 2045</i></small></h6>
+                                        <div class="text-primary mb-2">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <i class="far fa-star"></i>
+                                        </div>
+                                        <p>Diam amet duo labore stet elitr ea clita ipsum, tempor labore accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed sed eirmod ipsum.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="mb-4">Leave a review</h4>
+                                <small>Your email address will not be published. Required fields are marked *</small>
+                                <div class="d-flex my-3">
+                                    <p class="mb-0 mr-2">Your Rating * :</p>
+                                    <div class="text-primary">
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                </div>
+                                <form>
+                                    <div class="form-group">
+                                        <label for="message">Your Review *</label>
+                                        <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name">Your Name *</label>
+                                        <input type="text" class="form-control" id="name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Your Email *</label>
+                                        <input type="email" class="form-control" id="email">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Shop Detail End -->
+
+
+<!-- Footer Start -->
+<div class="container-fluid bg-dark text-secondary mt-5 pt-5">
+    <div class="row px-xl-5 pt-5">
+        <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
+            <h5 class="text-secondary text-uppercase mb-4">Get In Touch</h5>
+            <p class="mb-4">No dolore ipsum accusam no lorem. Invidunt sed clita kasd clita et et dolor sed dolor. Rebum tempor no vero est magna amet no</p>
+            <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
+            <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
+            <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
+        </div>
+        <div class="col-lg-8 col-md-12">
+            <div class="row">
+                <div class="col-md-4 mb-5">
+                    <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                        <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-5">
+                    <h5 class="text-secondary text-uppercase mb-4">My Account</h5>
+                    <div class="d-flex flex-column justify-content-start">
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Home</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shop Detail</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Shopping Cart</a>
+                        <a class="text-secondary mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Checkout</a>
+                        <a class="text-secondary" href="#"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-5">
+                    <h5 class="text-secondary text-uppercase mb-4">Newsletter</h5>
+                    <p>Duo stet tempor ipsum sit amet magna ipsum tempor est</p>
+                    <form action="">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Your Email Address">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary">Sign Up</button>
+                            </div>
+                        </div>
+                    </form>
+                    <h6 class="text-secondary text-uppercase mt-4 mb-3">Follow Us</h6>
+                    <div class="d-flex">
+                        <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-twitter"></i></a>
+                        <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-primary btn-square mr-2" href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a class="btn btn-primary btn-square" href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row border-top mx-xl-5 py-4" style="border-color: rgba(256, 256, 256, .1) !important;">
+        <div class="col-md-6 px-xl-0">
+            <p class="mb-md-0 text-center text-md-left text-secondary">
+                &copy; <a class="text-primary" href="#">Domain</a>. All Rights Reserved. Designed
+                by
+                <a class="text-primary" href="https://htmlcodex.com">HTML Codex</a>
+            </p>
+        </div>
+        <div class="col-md-6 px-xl-0 text-center text-md-right">
+            <img class="img-fluid" src="img/payments.png" alt="">
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+<div class="modal fade" id="sliderModal" tabindex="-1">
+    <button style="position: absolute; top:10px; right:20px; border:none; background-color:transparent;" type="button" data-bs-dismiss="modal">
+        <i style="color: white;" class="fa-solid fa-xmark fa-2x"></i>
+    </button>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div id="imageSlider" class="carousel slide bg-dark">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#imageSlider" data-bs-slide-to="0" class="active"></button>
+                    <th:block th:each="item, itemStatus : ${product.extraImages}">
+                        <button type="button" data-bs-target="#imageSlider" th:data-bs-slide-to="${itemStatus.count}"></button>
+                    </th:block>
+                </div>
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="image-slider">
+                            <img th:src="@{${product.mainImagePath}}" th:alt="${product.mainImage}">
+                        </div>
+                    </div>
+                    <th:block th:each="item, itemStatus : ${product.extraImages}">
+                        <div class="carousel-item">
+                            <div class="image-slider">
+                                <img th:src="@{${item.productExtraImagePath}}" th:alt="${item.name}">
+                            </div>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn-slider btn-slider-previous" type="button" data-bs-target="#imageSlider" data-bs-slide="prev">
+        <i style="color:white;" class="fa-solid fa-angle-left fa-2x"></i>
+    </button>
+    <button class="btn-slider btn-slider-next" type="button" data-bs-target="#imageSlider" data-bs-slide="next">
+        <i style="color:white;" class="fa-solid fa-angle-right fa-2x"></i>
+    </button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var bigImage = $('#bigImage');
+        // handle show extra Image on bigImage:
+        $('.extra-image').on('click', function() {
+            const currentImageSrc = $(this).attr("src");
+            const currentImageIndex = parseInt($(this).attr("indexImage"));
+            $('.extra-image').removeClass('active');
+            $(this).addClass("active")
+            bigImage.attr("src", currentImageSrc);
+            bigImage.attr("indexImage", currentImageIndex);
+        })
+
+        // handle show image slider :
+        bigImage.on('click', function() {
+            // show slider:
+            $('#sliderModal').modal("show")
+
+            // get indexImage of current Image:
+            const currentImageIndex = parseInt($(this).attr("indexImage"));
+            // set current active image of slider :
+            $('#imageSlider').carousel(currentImageIndex);
+        })
+
+    })
+</script>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script th:href="@{/lib/easing/easing.min.js}"></script>
+<script th:href="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
+
+<!--&lt;!&ndash; Contact Javascript File &ndash;&gt;-->
+<!--<script src="mail/jqBootstrapValidation.min.js"></script>-->
+<!--<script src="mail/contact.js"></script>-->
+
+<!-- Template Javascript -->
+<script th:src="@{/js/main.js}"></script>
+</body>
+
+</html>

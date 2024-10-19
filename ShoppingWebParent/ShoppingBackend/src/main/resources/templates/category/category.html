@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <div th:replace="/fragment/fragments :: html_head('Category Management', 'tag')">
+    </div>
+</head>
+
+<body>
+<div class="container-fluid position-relative bg-white d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div th:replace="/fragment/sidebar :: admin_sidebar">
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <div th:replace="/fragment/header :: admin_header">
+
+        </div>
+        <!-- Navbar End -->
+
+        <!-- Recent Sales Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-light text-center rounded p-4">
+                <form th:action="@{/categories/page/1}" class="d-flex align-items-center mb-3">
+                    <!-- hidden field for sort and pagination -->
+                    <input type="hidden" name="sortField" th:value="${sortField}" />
+                    <input type="hidden" name="sortDir" th:value="${sortDir}" />
+
+                    <input class="form-control border-0 d-inline-block" type="search" name="keyword" th:value="${keyword!=null ? keyword : ''}"  placeholder="Search category with keyword..." />
+                    <input class="ms-2 btn btn-success" type="submit" value="Search"/>
+                    <button type="button" class="btn btn-secondary ms-1" onclick="handleSeeAllCategories()">Clear</button>
+                </form>
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="mb-0">Category Management</h6>
+                    <a class="btn btn-outline-primary" th:href="@{/categories/new}">Add Category</a>
+                </div>
+
+                <!-- Message not found -->
+                <h2 th:if="${totalPages < 1 && keyword==null}" class="text-center">Category List is empty</h2>
+                <h2 th:if="${totalPages < 1 && keyword!=null}" class="text-center">No categories were found with the given keyword: [[${keyword}]]</h2>
+                <!-- END TABLE -->
+                <div th:if="${totalPages > 0}" class="table-responsive">
+                    <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <thead>
+                        <tr class="text-dark">
+                            <th scope="col">
+                                <a class="d-flex justify-content-between align-items-center" th:href="@{'/categories/page/'+${pageNumber}+'?sortField=name&sortDir='+${sortField=='name' ? reverseSortDir : sortDir}+${keyword!=null ? '&keyword='+keyword : ''}}">
+                                    Name
+                                    <i th:if="${sortField=='name'}" th:class="${sortDir=='asc' ? 'fa-duotone fa-solid fa-sort-up' : 'fa-duotone fa-solid fa-sort-down'}"></i>
+                                </a>
+                            </th>
+                            <th scope="col">
+                                <a class="d-flex justify-content-between align-items-center" th:href="@{'/categories/page/'+${pageNumber}+'?sortField=description&sortDir='+${sortField=='description' ? reverseSortDir : sortDir}+${keyword!=null ? '&keyword='+keyword : ''}}">
+                                    Description
+                                    <i th:if="${sortField=='description'}" th:class="${sortDir=='asc' ? 'fa-duotone fa-solid fa-sort-up' : 'fa-duotone fa-solid fa-sort-down'}"></i>
+                                </a>
+                            </th>
+                            <th scope="col">Enabled</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="item : ${categoryList}">
+                            <tr>
+                                <td th:text="${item.name}"></td>
+                                <td th:text="${item.description}"></td>
+                                <td th:text="${item.enabled}"></td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary" th:href="@{'/categories/edit/'+${item.id}}">Edit</a>
+                                    <a class="btn btn-sm btn-danger btn-delete" th:href="@{'/categories/delete/'+${item.id}}" th:categoryName="${item.name}">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                    <!-- PAGINATION -->
+                    <nav th:if="${totalPages>1}" class="mt-3 container-fluid">
+                        <ul class="pagination justify-content-center">
+                            <!-- btn first page -->
+                            <li class="page-item" th:classappend="${pageNumber <= 1} ? 'disabled' : ''">
+                                <a th:if="${pageNumber > 1}" class="page-link" th:href="@{'/categories/page/1?sortField='+${sortField}+'&sortDir='+${sortDir}+ ${keyword!=null ? '&keyword='+ keyword : ''}}">First Page</a>
+                                <a th:unless="${pageNumber > 1}" class="page-link">First Page</a>
+                            </li>
+                            <!-- End btn first page -->
+
+                            <!-- btn previous -->
+                            <li class="page-item" th:classappend="${pageNumber <= 1} ? 'disabled' : ''">
+                                <a th:if="${pageNumber > 1}" class="page-link" th:href="@{'/categories/page/'+${pageNumber - 1}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+ ${keyword!=null ? '&keyword='+ keyword : ''}}">
+                                    <span>&laquo;</span>
+                                </a>
+                                <a th:unless="${pageNumber > 1}" class="page-link">
+                                    <span>&laquo;</span>
+                                </a>
+                            </li>
+                            <!-- End btn previous -->
+
+                            <!-- page number link -->
+                            <!-- Chỉ hiển thị 5 items : -->
+                            <li th:each="index : ${#numbers.sequence(
+                                pageNumber <= 3 ? 1 : (pageNumber >= totalPages - 2 ? (totalPages - 4 <= 0 ? 1 : totalPages - 4) : pageNumber - 2),
+                                totalPages >= 5 ? (pageNumber <= 3 ? 5 : (pageNumber >= totalPages - 2 ? totalPages : pageNumber + 2)) : totalPages)}"
+                                class="page-item"
+                                th:classappend="${pageNumber == index} ? 'active' : ''">
+
+                                <a th:if="${pageNumber != index}"
+                                   class="page-link"
+                                   th:href="@{'/categories/page/' + ${index} + '?sortField=' + ${sortField} +'&sortDir='+${sortDir}+ ${keyword != null ? '&keyword=' + keyword : ''}}">
+                                    [[${index}]]
+                                </a>
+
+                                <a th:unless="${pageNumber != index}" class="page-link">[[${index}]]</a>
+                            </li>
+                            <!-- End page number link -->
+
+                            <!-- btn next -->
+                            <li class="page-item" th:classappend="${pageNumber >= totalPages} ? 'disabled' : ''">
+                                <a th:if="${pageNumber < totalPages}" class="page-link" th:href="@{'/categories/page/'+${pageNumber + 1}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+ ${keyword!=null ? '&keyword='+ keyword : ''}}">
+                                    <span>&raquo;</span>
+                                </a>
+                                <a th:unless="${pageNumber < totalPages}" class="page-link">
+                                    <span>&raquo;</span>
+                                </a>
+                            </li>
+                            <!-- End btn next -->
+                            <!-- btn last page -->
+                            <li class="page-item" th:classappend="${pageNumber >= totalPages} ? 'disabled' : ''">
+                                <a th:if="${pageNumber < totalPages}" class="page-link" th:href="@{'/categories/page/'+${totalPages}+'?sortField='+${sortField}+'&sortDir='+${sortDir}+ ${keyword!=null ? '&keyword='+ keyword : ''}}">Last Page</a>
+                                <a th:unless="${pageNumber < totalPages}" class="page-link">Last Page</a>
+                            </li>
+                            <!-- End btn last page -->
+                        </ul>
+                    </nav>
+                    <div th:if="${totalPages>1}" class="text-center">
+                        <p>[[${firstPageNumber}]] - [[${lastPageNumber}]] of [[${totalElements}]] categories</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Recent Sales End -->
+
+        <!-- Footer Start -->
+        <div th:replace="/fragment/footer :: admin_footer">
+
+        </div>
+        <!-- Footer End -->
+    </div>
+    <!-- Content End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="confirmDeleteModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 id="confirmDeleteModalTitle" class="modal-title fs-5"></h1>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmDeleteModalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-success" id="btn-confirm-delete" href="">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<div th:replace="/fragment/fragments :: html_script">
+
+</div>
+
+<script>
+    // using jquery:
+    $(document).ready(function (){
+        // Handle show delete confirm modal:
+        $('.btn-delete').on('click', function (e){
+            // Ngăn hành vi href của thẻ <a>
+            e.preventDefault();
+
+            var categoryName = $(this).attr("categoryName");
+            // Show ModaL
+            $('#confirmDeleteModalTitle').text('Delete Confirmation')
+            $('#confirmDeleteModalMessage').text("Are you sure you want to delete category with name: "+categoryName)
+            $('#confirmDeleteModal').modal('show')
+
+            // Ấn btn delete ở Modal để delete :
+            // Lấy ra link delete:
+            var linkDelete = $(this).attr('href')
+            console.log(linkDelete)
+            // set value cho attribute href của #btn-confirm-delete  là link để delete :
+            $('#btn-confirm-delete').attr("href", linkDelete)
+        })
+    })
+
+    // handle when click btn See All :
+    function handleSeeAllCategories()
+    {
+        window.location = "[[@{/categories}]]";
+    }
+</script>
+</body>
+
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <div th:replace="/fragment/fragments :: html_head('Category Management', 'tag')">
+    </div>
+
+    <!-- rich text editor -->
+    <link rel="stylesheet" th:href="@{/richtext/richtext.min.css}"/>
+    <script type="text/javascript" th:src="@{/richtext/jquery.richtext.min.js}"></script>
+
+    <style>
+        .image-container {
+            width: 100%; /* Đảm bảo container đầy đủ chiều rộng của cột */
+            padding-top: 75%; /* Giữ tỷ lệ 1:1 cho hình ảnh, tương đương với hình vuông */
+            position: relative; /* Đảm bảo phần tử con bên trong được định vị chính xác */
+        }
+
+        .image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-width: 100%; /* Điều chỉnh kích thước tối đa */
+            max-height: 300px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container-fluid position-relative bg-white d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div th:replace="/fragment/sidebar :: admin_sidebar">
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <div th:replace="/fragment/header :: admin_header">
+
+        </div>
+        <!-- Navbar End -->
+
+
+        <!-- Form Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="bg-light rounded h-100 p-4">
+                        <h3 class="mb-4">[[${pageTitle}]]</h3>
+                        <form th:action="@{/products/save}"
+                              th:object="${product}"
+                              enctype="multipart/form-data"
+                              method="POST">
+                            <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#nav-overview" type="button" role="tab">Overview</button>
+                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-description" type="button" role="tab">Description</button>
+                                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nav-images" type="button" role="tab">Images</button>
+                                </div>
+                            </nav>
+                            <div class="tab-content mt-3" id="nav-tabContent">
+                                <div class="tab-pane fade show active p-3" id="nav-overview" role="tabpanel">
+                                    <div th:replace="product/fragment/product_overview :: content_overview">
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade p-3" id="nav-description" role="tabpanel">
+                                    <div th:replace="product/fragment/product_description :: content_description">
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade p-3" id="nav-images" role="tabpanel">
+                                    <div th:replace="product/fragment/product_images :: content_images">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5 justify-content-center">
+                                <div class="col col-sm-3">
+                                    <input type="submit" class="btn btn-primary p-2" style="width: 100%;" value="Save">
+                                </div>
+                                <div class="col col-sm-3">
+                                    <a th:href="@{/products}" class="btn btn-secondary p-2" style="width: 100%;">Cancel</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Form End -->
+
+
+        <!-- Footer Start -->
+        <div th:replace="/fragment/footer :: admin_footer">
+
+        </div>
+        <!-- Footer End -->
+    </div>
+    <!-- Content End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<!-- JavaScript Libraries -->
+<div th:replace="/fragment/fragments :: html_script">
+
+</div>
+
+<script type="text/javascript">
+    const defaultImageThumbnailSrc = "[[@{/images/img-thumbnail-default.jpg}]]";  // for product_form_images.js
+    // using Jquery:
+    $(document).ready(function () {
+        // activate rich text editor:
+        $('#shortDescription').richText();
+        $('#fullDescription').richText();
+    })
+</script>
+
+<!-- Template Javascript -->
+<script th:src="@{/js/product_form_images.js}"></script>
+
+</body>
+
+</html>
