@@ -3,7 +3,7 @@
 <!-- Fragment : html header -->
 <head th:fragment="html_head(pageTitle, removeType)" th:remove="${removeType}">
     <meta charset="utf-8">
-    <title>MultiShop - Online Shop Website Template</title>
+    <title>[[${pageTitle}]] - Shopping Mobile</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="Free HTML Templates" name="keywords">
     <meta content="Free HTML Templates" name="description">
@@ -62,20 +62,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-<div th:fragment="html_script" th:remove="tag">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:src="@{/staticLogin/lib/chart/chart.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/easing/easing.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/waypoints/waypoints.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/owlcarousel/owl.carousel.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/tempusdominus/js/moment.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/tempusdominus/js/moment-timezone.min.js}"></script>
-    <script th:src="@{/staticLogin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
+    <!-- Fragment for show price -->
+    <!-- method of thymeleaf : formatDecimal(number, minIntDigits, thousandsPointType, decimalDigits, decimalPointType)-->
+    <div th:fragment="product_price(productPrice)" th:remove="tag">
+        <span th:if="${CURRENCY_SYMBOL_POSITION} == 'Before price'">[[${CURRENCY_SYMBOL}]]</span>
+        [[${#numbers.formatDecimal(productPrice, 1, 'COMMA', 2, 'POINT')}]]
+        <span th:if="${CURRENCY_SYMBOL_POSITION} == 'After price'">[[${CURRENCY_SYMBOL}]]</span>
+    </div>
 
-    <!-- Template Javascript -->
-    <script th:src="@{/staticLogin/js/main.js}"></script>
-    <script th:src="@{/staticLogin/js/common.js}"></script>
-</div>
+    <div th:fragment="html_script" th:remove="tag">
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/staticLogin/lib/chart/chart.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/easing/easing.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/waypoints/waypoints.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/owlcarousel/owl.carousel.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/tempusdominus/js/moment.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/tempusdominus/js/moment-timezone.min.js}"></script>
+        <script th:src="@{/staticLogin/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
+
+        <!-- Template Javascript -->
+        <script th:src="@{/staticLogin/js/main.js}"></script>
+        <script th:src="@{/staticLogin/js/common.js}"></script>
+    </div>
 </body>
 </html>

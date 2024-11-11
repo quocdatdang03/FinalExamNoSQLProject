@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ProductRepository extends MongoRepository<Product, String> {
     @Query("{ $or: [ { name: { $regex: ?0, $options: 'i' } }, { price: { $regex: ?0, $options: 'i' } } ] }")
@@ -15,7 +17,7 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     public void deleteByCategoryId(String categoryId);
 
     // filter by category (include subcategory of that category):
-    public Page<Product> findProductsByCategoryId(String categoryId, Pageable pageable);
+    public Page<Product> findByCategoryId(String categoryId, Pageable pageable);
 
     @Query("{ $and: [ " +
             "{ $or: [ { name: { $regex: ?0, $options: 'i' } }, { price: { $regex: ?0, $options: 'i' } } ] }, " +
@@ -23,4 +25,5 @@ public interface ProductRepository extends MongoRepository<Product, String> {
             "] }")
     public Page<Product> searchWithKeywordAndFilterByCategory(String keyword, String categoryId, Pageable pageable);
 
+    public List<Product> findByCategoryId(String categoryId);
 }

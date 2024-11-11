@@ -33,6 +33,11 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public List<Product> getAllProductsByCategoryId(String categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
+
+    @Override
     public Product getProductById(String id) {
         return productRepository.findById(id).get();
     }
@@ -57,7 +62,7 @@ public class ProductServiceImpl implements ProductService{
 
         // in case filter by category without search with keyword
         if(categoryId!=null && !categoryId.equals("0")) {
-            return productRepository.findProductsByCategoryId(categoryId, pageable);
+            return productRepository.findByCategoryId(categoryId, pageable);
         }
 
         return productRepository.findAll(pageable);

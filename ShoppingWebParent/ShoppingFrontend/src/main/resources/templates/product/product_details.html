@@ -117,6 +117,22 @@
             object-position: center;
         }
 
+        /* Style cho toast */
+        .toastMessage {
+            display: none;
+            min-width: 250px;
+            background-color: #10b222;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            top:100px;
+            right:50px;
+            transform: translateX(-50%);
+        }
+
     </style>
 </head>
 
@@ -140,8 +156,15 @@
     <div class="row px-xl-5">
         <div class="col-12">
             <nav class="breadcrumb bg-light mb-30">
-                <a class="breadcrumb-item text-dark" th:href="@{/products}">Home</a>
-                <span class="breadcrumb-item active">Shop Detail</span>
+                <li class="breadcrumb-item">
+                    <a class="text-dark" th:href="@{/}">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a class="text-dark" th:href="@{/products}">Shop</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    [[${product.name}]]
+                </li>
             </nav>
         </div>
     </div>
@@ -207,25 +230,32 @@
                         In stock
                     </div>
                     <div th:unless="${product.inStock==true}">
-                        Sold out
+                        <span class="text-danger" style="font-size: 16px;">Sold out</span>
                     </div>
                 </div>
-                <div class="d-flex align-items-center mb-4 pt-2">
+                <div th:if="${product.inStock}" class="d-flex align-items-center mb-4 pt-2">
                     <div class="input-group quantity mr-3" style="width: 130px;">
                         <div class="input-group-btn">
-                            <button class="btn btn-primary btn-minus">
+                            <button class="btn btn-primary btn-minus disabled btnMinus" th:productId="${product.id}">
                                 <i class="fa fa-minus"></i>
                             </button>
                         </div>
-                        <input type="text" class="form-control bg-secondary border-0 text-center" value="1">
+                        <input
+                                type="text"
+                                class="form-control bg-secondary border-0 text-center"
+                                value="1"
+                                th:id="'quantityInput' + ${product.id}" onkeydown="return false;"
+                        >
                         <div class="input-group-btn">
-                            <button class="btn btn-primary btn-plus">
+                            <button class="btn btn-primary btn-plus btnPlus" th:productId="${product.id}">
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To
-                        Cart</button>
+                    <button class="btn btn-primary px-3" id="btnAddToCart">
+                        <i class="fa fa-shopping-cart mr-1"></i>
+                         Add To Cart
+                    </button>
                 </div>
             </div>
         </div>
@@ -312,7 +342,7 @@
             <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
             <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
         </div>
-        <div class="col-lg-8 col-md-12">
+        <div class="col-lg-8 col-md-12">S
             <div class="row">
                 <div class="col-md-4 mb-5">
                     <h5 class="text-secondary text-uppercase mb-4">Quick Shop</h5>
@@ -416,7 +446,74 @@
     </button>
 </div>
 
+<!-- Toast message when add product to cart successfully -->
+<!--<div class="toast-container position-fixed top-0 end-0 pe-3 pt-5">-->
+<!--    <div id="liveToast" class="toast alert alert-success text-bg-success" role="alert">-->
+<!--        <div class="d-flex align-items-center justify-content-between">-->
+<!--            <span>Product has been added to the cart</span>-->
+<!--            <button type="button" class="btn-close text-white" data-bs-dismiss="toast"></button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div id="liveToast" class="toastMessage alert alert-success text-bg-success">
+    <div class="d-flex align-items-center justify-content-between">
+        <i class="fa-solid fa-circle-check"></i>
+        <span class="d-inline ms-1">Product has been added to the cart</span>
+    </div>
+</div>
+
+<!-- Modal Login-->
+<div class="modal fade" id="loginModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="p-4 p-sm-5">
+                <h2 class="text-center mb-5 fw-light fs-5">Sign In</h2>
+                <!-- action /login với method post sẽ tự động được xử lý logic Login bởi Spring Security  -->
+                <form th:action="@{/login}" method="post">
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" name="email" id="floatingInput" placeholder="dat@example.com" required>
+                        <label for="floatingInput">Email address</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" name="password" id="floatingPassword" placeholder="Password" required>
+                        <label for="floatingPassword">Password</label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" name="remember-me" type="checkbox" id="rememberPasswordCheck">
+                        <label class="form-check-label" for="rememberPasswordCheck">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary btn-login text-uppercase fw-bold" type="submit">Sign in</button>
+                    </div>
+                    <div class="text-center mt-2">
+                        <p class="mb-0">or <a class="text-primary text-decoration-none" th:href="@{/forgot_password}">Forgot password</a></p>
+                    </div>
+                    <div class="text-center mt-1">
+                        <p>Don't have an account? <a class="fw-bold text-primary text-decoration-none" th:href="@{/register}">Sign Up</a></p>
+                    </div>
+                    <hr class="my-4">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script type="text/javascript">
+    var contextPath = "[[@{/}]]"
+    var productId = "[[${product.id}]]"
+
+    // create CSRF HeaderName and CSRF Value:
+    var csrfHeaderName = "[[${_csrf.headerName}]]";
+    var csrfValue = "[[${_csrf.token}]]";
+
     $(document).ready(function() {
         var bigImage = $('#bigImage');
         // handle show extra Image on bigImage:
@@ -440,7 +537,34 @@
             $('#imageSlider').carousel(currentImageIndex);
         })
 
+        // handle when click btn add to cart :
+        $('#btnAddToCart').on('click', function() {
+            handleAddProductToCart();
+        })
     })
+
+    function handleAddProductToCart() {
+        const quantity = $('#quantityInput'+productId).val()
+        const requestURL = contextPath + "cart/add/" + productId + "/" + quantity;
+
+        $.ajax({
+            type : "POST",
+            url : requestURL,
+            beforeSend : function (xhr) {
+                xhr.setRequestHeader(csrfHeaderName, csrfValue);
+            }
+        }).done(function(response) {
+            if(response==='success') {
+                $('#liveToast').fadeIn(400).delay(3000).fadeOut(400);
+            }
+            else if(response==='notLogin'){
+                // Nếu email đã tồn tại trong DB thì show MODAL:
+                $('#loginModal').modal('show') // .modal('show') : là method của bootstrap để hiển thị Modal
+            }
+        }).fail(function() {
+            alert("Error while adding product to shopping cart");
+        })
+    }
 </script>
 
 <!-- JavaScript Libraries -->
@@ -449,12 +573,9 @@
 <script th:href="@{/lib/easing/easing.min.js}"></script>
 <script th:href="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
 
-<!--&lt;!&ndash; Contact Javascript File &ndash;&gt;-->
-<!--<script src="mail/jqBootstrapValidation.min.js"></script>-->
-<!--<script src="mail/contact.js"></script>-->
-
 <!-- Template Javascript -->
 <script th:src="@{/js/main.js}"></script>
+<script th:src="@{/staticLogin/js/common.js}"></script>
 </body>
 
 </html>

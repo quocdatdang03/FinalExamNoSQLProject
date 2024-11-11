@@ -37,6 +37,11 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
+    public List<Category> getEnabledCategories() {
+        return categoryRepository.findByEnabledTrue();
+    }
+
+    @Override
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }

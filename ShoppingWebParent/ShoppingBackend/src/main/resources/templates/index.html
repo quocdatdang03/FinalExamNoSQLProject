@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
 <head>
     <div th:replace="/fragment/fragments :: html_head('Category Management', 'tag')">
     </div>
@@ -30,7 +32,14 @@
         </div>
         <!-- Navbar End -->
 
-        <h1>DashBoard Admin</h1>
+        <div class="p-5" style="height:80vh;">
+            <h1>DashBoard Admin</h1>
+            <th:block sec:authorize="isAuthenticated()">
+                <div>
+                    Welcome <b sec:authentication="principal.fullName"></b>
+                </div>
+            </th:block>
+        </div>
 
 
         <!-- Footer Start -->

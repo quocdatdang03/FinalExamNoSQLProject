@@ -18,7 +18,7 @@ public class CategoryController {
     @Autowired
     private CategoryServiceImpl categoryService;
 
-    @GetMapping("")
+    @GetMapping("/c/{categoryId}")
     public String showCategoryList(Model model) {
 
         List<Category> categoryList = categoryService.getAllCategories();

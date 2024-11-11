@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" >
+
+<head>
+    <div th:replace="/fragment/fragments :: html_head(${pageTitle}, 'tag')">
+    </div>
+</head>
+
+<body>
+    <!-- Header -->
+    <div th:replace="/fragment/header :: web_header">
+
+    </div>
+    <!-- End Header -->
+
+    <!-- Navbar Start -->
+    <div th:replace="/fragment/navbar :: web_navbar">
+
+    </div>
+    <!-- Navbar End -->
+
+
+    <!-- Breadcrumb Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-12">
+                <div class="col-12">
+                    <nav class="breadcrumb bg-light mb-30">
+                        <a class="breadcrumb-item text-dark" th:href="@{/}">Home</a>
+                        <li class="breadcrumb-item active">Account Details</li>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+
+<!-- Checkout Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-lg-8 offset-2">
+            <div th:if="${message!=null}" class="alert alert-success alert-dismissible fade show mx-auto" style="max-width: 700px;" role="alert" >
+                <i class="fa-solid fa-circle-check"></i>
+                [[${message}]]
+                <button type="button" class="bg-transparent" data-bs-dismiss="alert">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Account Details</span></h5>
+            <div class="bg-light p-30 mb-5">
+                <form th:action="@{/account_details}" method="post" th:object="${user}">
+                    <div class="row">
+                            <!-- Hidden Field to store ID-->
+                            <input type="hidden" id="id" th:field="*{id}" />
+                            <!-- Hidden field to store roles -->
+                            <input type="hidden" th:field="*{role}" />
+                            <!-- Hidden field to store enabled -->
+                            <input type="hidden" th:field="*{enabled}" />
+                            <div class="col-md-6 form-group">
+                                <label>First Name</label>
+                                <input class="form-control" type="text" th:field="*{firstName}">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Last Name</label>
+                                <input class="form-control" type="text" th:field="*{lastName}">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>E-mail  <i>(*can't be changed!)</i></label>
+                                <input class="form-control" type="text" readonly th:field="*{email}">
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label>Password</label>
+                                <input class="form-control" type="password" th:field="*{password}" placeholder="Leave blank if you don't want to change password">
+                            </div>
+                            <input class="col-6 offset-3 btn btn-primary" type="submit" value="Save changes">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Checkout End -->
+
+
+    <!-- Footer Start -->
+    <div th:replace="/fragment/footer :: web_footer">
+
+    </div>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Libraries -->
+    <script type="text/javascript">
+        var contextPath = "[[@{/}]]"
+
+        // create CSRF HeaderName and CSRF Value:
+        var csrfHeaderName = "[[${_csrf.headerName}]]";
+        var csrfValue = "[[${_csrf.token}]]";
+    </script>
+    <div th:replace="/fragment/fragments :: html_script"></div>
+    <script type="text/javascript" th:src="@{/js/jquery.number.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/shopping-cart.js}"></script>
+
+</body>
+
+</html>

@@ -44,6 +44,14 @@ public class ProductController {
         return showProductsByPage(1,"asc","name",null,"0",model);
     }
 
+    @GetMapping("/c/{categoryId}")
+    public String showProductListByCategory(@PathVariable("categoryId") String categoryId, Model model) {
+        List<Product> productList = productService.getAllProductsByCategoryId(categoryId);
+        model.addAttribute("productList", productList);
+
+        return showProductsByPage(1,"asc","name",null,categoryId,model);
+    }
+
     @GetMapping("/page/{pageNumber}")
     public String showProductsByPage(
             @PathVariable("pageNumber") Integer pageNumber,
@@ -88,6 +96,7 @@ public class ProductController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("firstPageNumber", firstPageNumber);
         model.addAttribute("lastPageNumber", lastPageNumber);
+        model.addAttribute("categoryId", categoryId);
 
         if(categoryId!=null)
            model.addAttribute("selectedCategoryId", categoryId);

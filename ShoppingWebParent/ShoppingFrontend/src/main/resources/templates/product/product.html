@@ -27,7 +27,8 @@
     <div class="row px-xl-5">
         <div class="col-12">
             <nav class="breadcrumb bg-light mb-30">
-                <a class="breadcrumb-item text-dark" th:href="@{/products}">Home</a>
+                <a class="breadcrumb-item text-dark" th:href="@{/}">Home</a>
+                <li class="breadcrumb-item active">Shop</li>
             </nav>
         </div>
     </div>
@@ -49,6 +50,7 @@
                                     <!-- hidden field for sort and pagination -->
                                     <input type="hidden" name="sortField" th:value="${sortField}" />
                                     <input type="hidden" name="sortDir" th:value="${sortDir}" />
+                                    <input th:if="${categoryId!='' && categoryId!=null && categoryId!='0'}" type="hidden" name="categoryId" th:value="${categoryId}" />
 
                                     <input type="search" class="form-control" placeholder="Search for products" name="keyword" th:value="${keyword!=null ? keyword : ''}" >
                                     <button type="submit" class="input-group-append">
@@ -56,7 +58,8 @@
                                             <i class="fa fa-search"></i>
                                         </span>
                                     </button>
-                                    <button type="button" class="btn btn-secondary ms-2 border" onclick="handleSeeAllProducts()">Clear</button>
+                                    <button th:if="${categoryId=='0' || categoryId==null}" type="button" class="btn btn-secondary ms-2 border" onclick="handleSeeAllProducts()">Clear</button>
+                                    <button th:if="${categoryId!='0' && categoryId!=null}" type="button" class="btn btn-secondary ms-2 border" onclick="handleSeeAllProductsByCategory(this)" th:categoryId="${categoryId}">Clear</button>
                                 </div>
                             </form>
                         </div>
@@ -66,6 +69,7 @@
                                 <input type="hidden" name="sortField" th:value="${sortField}" />
                                 <input type="hidden" name="sortDir" th:value="${sortDir}" />
                                 <input type="hidden" name="keyword" th:value="${keyword}" />
+
                                 <select class="form-select" name="categoryId" id="categoryDropDown">
                                     <option value="0">All categories</option>
                                     <th:block th:each="item : ${categoryList}">
@@ -83,13 +87,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-6 pb-1">
                         <div class="product-item bg-light mb-4">
                             <div class="product-img position-relative overflow-hidden">
-                                <img class="img-fluid w-100" th:src="@{${item.mainImagePath}}" th:alt="${item.mainImage}">
-                                <div class="product-action">
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
-                                </div>
+                                <img class="img-fluid w-100" style="height: 250px; object-fit: cover; object-position: center" th:src="@{${item.mainImagePath}}" th:alt="${item.mainImage}">
                             </div>
                             <div class="text-center py-4">
                                 <a class="h6 text-decoration-none text-truncate" style=" font-size: 16px;
@@ -213,12 +211,10 @@
 <script th:href="@{/lib/easing/easing.min.js}"></script>
 <script th:href="@{/lib/owlcarousel/owl.carousel.min.js}"></script>
 
-<!--&lt;!&ndash; Contact Javascript File &ndash;&gt;-->
-<!--<script src="mail/jqBootstrapValidation.min.js"></script>-->
-<!--<script src="mail/contact.js"></script>-->
-
 <!-- Template Javascript -->
 <script th:src="@{/js/main.js}"></script>
+<script th:src="@{/staticLogin/js/common.js}"></script>
+
 
 <script>
     $(document).ready(function () {
@@ -227,11 +223,19 @@
             $('#searchForm').submit();
         })
     })
+
     // handle when click btn See All :
     function handleSeeAllProducts()
     {
         window.location = "[[@{/products}]]";
     }
+
+    // handle when click btn See All :
+    function handleSeeAllProductsByCategory(btnClear) {
+        const categoryId = btnClear.getAttribute("categoryId");
+        window.location = "[[@{/products/c/}]]" + categoryId;
+    }
+
 </script>
 </body>
 

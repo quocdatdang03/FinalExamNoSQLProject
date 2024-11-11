@@ -46,6 +46,12 @@
                         </span>
                     </div>
                     <!-- End Message Logout-->
+
+                    <!-- Message register successfully-->
+                    <div th:if="${message}" class="alert alert-primary d-flex align-items-center">
+                        <i class="me-2 fa-solid fa-circle-check"></i>
+                        <span>[[${message}]]</span>
+                    </div>
                     <form th:action="@{/login}" method="post">
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com" required>
