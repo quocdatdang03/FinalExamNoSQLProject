@@ -52,7 +52,7 @@ public class ShoppingUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isEnabled();
     }
 
     public String getFullName() {
