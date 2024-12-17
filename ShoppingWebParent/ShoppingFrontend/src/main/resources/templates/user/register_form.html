@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head>
-    <div th:replace="/fragment/fragments :: html_head_login('Sign In', 'tag')">
+    <div th:replace="/fragment/fragments :: html_head_login('Sign Up', 'tag')">
     </div>
 </head>
 
@@ -17,7 +17,7 @@
     <!-- Spinner End -->
 
 
-    <!-- Sign In Start -->
+    <!-- Sign Up Start -->
     <div class="container-fluid">
         <div class="row h-100 align-items-center justify-content-center" style="min-height: 100vh;">
             <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
@@ -33,26 +33,41 @@
                         <!-- Thêm CSRF token -->
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
 
+                        <!-- First name -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="firstNameInput" name="firstName" th:field="*{firstName}" placeholder="E.g. Dang" required>
+                            <input type="text" class="form-control" id="firstNameInput" name="firstName" th:field="*{firstName}" placeholder="E.g. Dang">
                             <label for="firstNameInput">First name</label>
+                            <span class="error-message text-danger" id="firstNameError"></span>
                         </div>
+
+                        <!-- Last name -->
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="lastNameInput" name="lastName" th:field="*{lastName}" placeholder="E.g. Quoc Dat" required>
+                            <input type="text" class="form-control" id="lastNameInput" name="lastName" th:field="*{lastName}" placeholder="E.g. Quoc Dat">
                             <label for="lastNameInput">Last name</label>
+                            <span class="error-message text-danger" id="lastNameError"></span>
                         </div>
+
+                        <!-- Email -->
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="emailInput" name="email" th:field="*{email}" placeholder="name@example.com" required>
+                            <input type="email" class="form-control" id="emailInput" name="email" th:field="*{email}" placeholder="name@example.com">
                             <label for="emailInput">Email address</label>
+                            <span class="error-message text-danger" id="emailError"></span>
                         </div>
+
+                        <!-- Password -->
                         <div class="form-floating mb-4">
-                            <input type="password" class="form-control" id="passwordInput" name="password" th:field="*{password}" placeholder="Password" required>
+                            <input type="password" class="form-control" id="passwordInput" name="password" th:field="*{password}" placeholder="Password">
                             <label for="passwordInput">Password</label>
+                            <span class="error-message text-danger" id="passwordError"></span>
                         </div>
+
+                        <!-- Confirm Password -->
                         <div class="form-floating mb-4">
-                            <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm password" required>
+                            <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm password">
                             <label for="confirmPasswordInput">Confirm password</label>
+                            <span class="error-message text-danger" id="confirmPasswordError"></span>
                         </div>
+
                         <button type="submit" class="btn btn-primary py-3 w-100 mb-4">Register</button>
 
                         <p class="text-center mt-3 mb-0">Already have an account? <a th:href="@{/login}">Sign In</a></p>
@@ -61,13 +76,76 @@
             </div>
         </div>
     </div>
-    <!-- Sign In End -->
+    <!-- Sign  End -->
 </div>
 
 <!-- JavaScript Libraries -->
 <div th:replace="/fragment/fragments :: html_script">
 
 </div>
+
+<script>
+    document.getElementById('formRegister').addEventListener('submit', function (e) {
+        e.preventDefault(); // Ngăn form gửi đi trước khi validate
+
+        // Lấy giá trị của input
+        const firstName = document.getElementById('firstNameInput').value.trim();
+        const lastName = document.getElementById('lastNameInput').value.trim();
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+        const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+        // Xóa các thông báo lỗi cũ
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = "");
+
+        let isValid = true;
+
+        // Validate First Name
+        if (firstName === "") {
+            document.getElementById('firstNameError').textContent = "First name is required.";
+            isValid = false;
+        }
+
+        // Validate Last Name
+        if (lastName === "") {
+            document.getElementById('lastNameError').textContent = "Last name is required.";
+            isValid = false;
+        }
+
+        // Validate Email
+        if (email === "") {
+            document.getElementById('emailError').textContent = "Email is required.";
+            isValid = false;
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+            document.getElementById('emailError').textContent = "Please enter a valid email address.";
+            isValid = false;
+        }
+
+        // Validate Password
+        if (password === "") {
+            document.getElementById('passwordError').textContent = "Password is required.";
+            isValid = false;
+        } else if (password.length < 6) {
+            document.getElementById('passwordError').textContent = "Password must be at least 6 characters.";
+            isValid = false;
+        }
+
+        // Validate Confirm Password
+        if (confirmPassword === "") {
+            document.getElementById('confirmPasswordError').textContent = "Please confirm your password.";
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
+            isValid = false;
+        }
+
+        // Nếu mọi thứ hợp lệ, gửi form
+        if (isValid) {
+            e.target.submit();
+        }
+    });
+
+</script>
 
 <!-- Template Javascript -->
 <script th:src="@{/js/main.js}"></script>
